@@ -1,3 +1,5 @@
+import { createReadStream, unlinkSync, writeFileSync } from "fs";
+import path from "path";
 import ChatwootClient, {
   ChatwootAPIConfig,
   contact,
@@ -11,10 +13,8 @@ import { request as chatwootRequest } from '@figuro/chatwoot-sdk/dist/core/reque
 import axios from 'axios';
 import { proto } from 'baileys';
 import FormData from 'form-data';
-import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import Jimp from 'jimp';
 import mimeTypes from 'mime-types';
-import path from 'path';
 
 import { Chatwoot, ConfigService, HttpServer } from '../../../../config/env.config';
 import { Logger } from '../../../../config/logger.config';
@@ -920,9 +920,10 @@ export class ChatwootService {
       const replyToIds = await this.getReplyToIds(messageBody, instance);
 
       if (replyToIds.in_reply_to || replyToIds.in_reply_to_external_id) {
-        data.append('content_attributes', {
-          ...replyToIds,
-        });
+        const content = JSON.stringify({
+          ...replyToIds
+        })
+        data.append('content_attributes', content);
       }
     }
 
